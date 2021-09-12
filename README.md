@@ -1,2 +1,2 @@
 # vox_object
-Vox object for monome crow
+Vox object only
