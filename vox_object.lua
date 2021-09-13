@@ -91,6 +91,7 @@ function Vox:play(args)
   args.degree = args.degree == nil and 1 or args.degree
   args.transpose = args.transpose == nil and 0 or args.transpose
 
+  -- update this somehow
   self.scale = args.scale == nil and self.scale or args.scale
   self.mask = args.mask == nil and self.mask or args.mask
   self.wrap = args.wrap == nil and self.wrap or args.wrap
