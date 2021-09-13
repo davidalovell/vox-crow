@@ -77,9 +77,27 @@ function Vox:new(args)
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
 
   o.seq = args.seq == nil and {} or args.seq
-  o.preset = args.preset == nil and {} or args.preset
 
   return o
+end
+
+function Vox:set(args)
+  local args = args == nil and {} or args
+
+  self.on = args.on == nil and self.on or args.on
+  self.level = args.level == nil and self.level or args.level
+  self.octave = args.octave == nil and self.octave or args.octave
+  self.degree = args.degree == nil and self.degree or args.degree
+  self.transpose = args.transpose == nil and self.transpose or args.transpose
+
+  self.scale = args.scale == nil and self.scale or args.scale
+  self.mask = args.mask == nil and self.mask or args.mask
+  self.wrap = args.wrap == nil and self.wrap or args.wrap
+  self.negharm = args.negharm == nil and self.negharm or args.negharm
+
+  self.synth = args.synth == nil and self.synth or args.synth
+
+  self.seq = args.seq == nil and {} or args.seq
 end
 
 function Vox:play(args)
@@ -91,15 +109,14 @@ function Vox:play(args)
   args.degree = args.degree == nil and 1 or args.degree
   args.transpose = args.transpose == nil and 0 or args.transpose
 
-  -- update this somehow
-  self.scale = args.scale == nil and self.scale or args.scale
-  self.mask = args.mask == nil and self.mask or args.mask
-  self.wrap = args.wrap == nil and self.wrap or args.wrap
-  self.negharm = args.negharm == nil and self.negharm or args.negharm
+  args.scale = args.scale == nil and self.scale or args.scale
+  args.mask = args.mask == nil and self.mask or args.mask
+  args.wrap = args.wrap == nil and self.wrap or args.wrap
+  args.negharm = args.negharm == nil and self.negharm or args.negharm
 
-  self.synth = args.synth == nil and self.synth or args.synth
+  args.synth = args.synth == nil and self.synth or args.synth
 
-  return self:__on(args) and self.synth(self:__note(args), self:__level(args))
+  return self:__on(args) and args.synth(self:__note(args), self:__level(args))
 end
 
 -- needs work
@@ -109,16 +126,16 @@ function Vox:__octave(args) return self.octave + args.octave + self:__wrap(args)
 function Vox:__degree(args) return (self.degree - 1) + (args.degree - 1) end
 function Vox:__transpose(args) return self.transpose + args.transpose end
 
-function Vox:__wrap(args) return self.wrap and 0 or math.floor(self:__degree(args) / #self.scale) end
+function Vox:__wrap(args) return args.wrap and 0 or math.floor(self:__degree(args) / #self.scale) end
 
-function Vox:__val(args) return self.scale[self:__degree(args) % #self.scale + 1] end
-function Vox:__maskval(args) return self.scale[selector(self:__val(args), self.mask, 1, #self.scale)] end
+function Vox:__val(args) return args.scale[self:__degree(args) % #args.scale + 1] end
+function Vox:__maskval(args) return args.scale[selector(self:__val(args), args.mask, 1, #args.scale)] end -- %
 
-function Vox:__mask(args) return self.mask == nil and self:__val(args) or self:__maskval(args) end
+function Vox:__mask(args) return args.mask == nil and self:__val(args) or self:__maskval(args) end
 function Vox:__pos(args) return self:__mask(args) + self:__transpose(args) end
 function Vox:__neg(args) return (7 - self:__pos(args)) % 12 end
 
-function Vox:__note(args) return (self.negharm and self:__neg(args) or self:__pos(args)) + self:__octave(args) * 12 end
+function Vox:__note(args) return (args.negharm and self:__neg(args) or self:__pos(args)) + self:__octave(args) * 12 end
 
 -- functions for mulitple Vox objects
 function _set(objects, property, val)
