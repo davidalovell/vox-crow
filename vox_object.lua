@@ -63,11 +63,11 @@ function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
   local args = args == nil and {} or args
 
-  o.on, o._on = args.on == nil and true or args.on, true
-  o.level, o._level = args.level == nil and 1 or args.level, 1
-  o.octave, o._octave = args.octave == nil and 0 or args.octave, 0
-  o.degree, o._degree = args.degree == nil and 1 or args.degree, 1
-  o.transpose, o._transpose = args.transpose == nil and 0 or args.transpose, 0
+  o.on = args.on == nil and true or args.on
+  o.level = args.level == nil and 1 or args.level
+  o.octave = args.octave == nil and 0 or args.octave
+  o.degree = args.degree == nil and 1 or args.degree
+  o.transpose = args.transpose == nil and 0 or args.transpose
 
   o.scale = args.scale == nil and cv.scale or args.scale
   o.mask = args.mask == nil and nil or args.mask
@@ -85,11 +85,11 @@ end
 function Vox:play(args)
   local args = args == nil and {} or args
 
-  self._on = args.on == nil and self._on or args.on
-  self._level = args.level == nil and self._level or args.level
-  self._octave = args.octave == nil and self._octave or args.octave
-  self._degree = args.degree == nil and self._degree or args.degree
-  self._transpose = args.transpose == nil and self._transpose or args.transpose
+  args.on = args.on == nil and true or args.on
+  args.level = args.level == nil and 1 or args.level
+  args.octave = args.octave == nil and 0 or args.octave
+  args.degree = args.degree == nil and 1 or args.degree
+  args.transpose = args.transpose == nil and 0 or args.transpose
 
   self.scale = args.scale == nil and self.scale or args.scale
   self.mask = args.mask == nil and self.mask or args.mask
@@ -98,35 +98,17 @@ function Vox:play(args)
 
   self.synth = args.synth == nil and self.synth or args.synth
 
-  return self:__on() and self.synth(self:__note(), self:__level())
-end
-
-function Vox:play2(args)
-  local args = args == nil and {} or args
-
-  args.on = args.on == nil and true or args.on
-  args.level = args.level == nil and 1 or args.level
-  args.octave = args.octave == nil and 0 or args.octave
-  args.degree = args.degree == nil and 1 or args.degree
-  args.transpose = args.transpose == nil and 0 or args.transpose
-
-  args.scale = args.scale == nil and self.scale or args.scale
-  args.mask = args.mask == nil and self.mask or args.mask
-  args.wrap = args.wrap == nil and self.wrap or args.wrap
-  args.negharm = args.negharm == nil and self.negharm or args.negharm
-
-  args.synth = args.synth == nil and self.synth or args.synth
-
   return self:__on(args) and self.synth(self:__note(args), self:__level(args))
 end
 
 -- needs work
 function Vox:__on(args) return self.on and args.on end
 function Vox:__level(args) return self.level * args.level end
-function Vox:__wrap(args) return self.wrap and 0 or math.floor(self:__degree(args) / #self.scale) end
 function Vox:__octave(args) return self.octave + args.octave + self:__wrap(args) end
 function Vox:__degree(args) return (self.degree - 1) + (args.degree - 1) end
 function Vox:__transpose(args) return self.transpose + args.transpose end
+
+function Vox:__wrap(args) return self.wrap and 0 or math.floor(self:__degree(args) / #self.scale) end
 
 function Vox:__val(args) return self.scale[self:__degree(args) % #self.scale + 1] end
 function Vox:__maskval(args) return self.scale[selector(self:__val(args), self.mask, 1, #self.scale)] end
