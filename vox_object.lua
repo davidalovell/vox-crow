@@ -70,6 +70,7 @@ function Vox:new(args)
   o.transpose = args.transpose == nil and 0 or args.transpose
 
   o.scale = args.scale == nil and cv.scale or args.scale
+  o.mask = args.mask == nil and nil or args.mask
   o.wrap = args.wrap == nil and false or args.wrap
   o.negharm = args.negharm == nil and false or args.negharm
 
@@ -90,6 +91,7 @@ function Vox:set(args)
   self.transpose = args.transpose == nil and self.transpose or args.transpose
 
   self.scale = args.scale == nil and self.scale or args.scale
+  self.mask = args.mask == nil and self.mask or args.mask
   self.wrap = args.wrap == nil and self.wrap or args.wrap
   self.negharm = args.negharm == nil and self.negharm or args.negharm
 
@@ -108,29 +110,37 @@ function Vox:play(args)
   args.transpose = args.transpose == nil and 0 or args.transpose
 
   args.scale = args.scale == nil and self.scale or args.scale
+  args.mask = args.mask == nil and self.mask or args.mask
   args.wrap = args.wrap == nil and self.wrap or args.wrap
   args.negharm = args.negharm == nil and self.negharm or args.negharm
 
   args.synth = args.synth == nil and self.synth or args.synth
 
-  return self:__on(args) and args.synth(self:__note(args), self:__level(args))
+  return self:_on(args) and args.synth(self:_note(args), self:_level(args))
 end
 
-function Vox:__on(args) return self.on and args.on end
-function Vox:__level(args) return self.level * args.level end
-function Vox:__octave(args) return self.octave + args.octave + self:__wrap(args) end
-function Vox:__degree(args) return (self.degree - 1) + (args.degree - 1) end
-function Vox:__transpose(args) return self.transpose + args.transpose end
+function Vox:_on(args) return self.on and args.on end
+function Vox:_transpose(args) return self.transpose + args.transpose end
+function Vox:_degree(args) return (self.degree - 1) + (args.degree - 1) end
+function Vox:_wrap(args) return args.wrap and 0 or math.floor(self:_degree(args) / #args.scale) end
+function Vox:_octave(args) return self.octave + args.octave + self:_wrap(args) end
 
-function Vox:__wrap(args) return args.wrap and 0 or math.floor(self:__degree(args) / #args.scale) end
+function Vox:_note(args)
+  local ix = self:_degree(args) % #args.scale + 1
+  local val = args.scale[ix] + self:_transpose(args)
 
-function Vox:__ix(args) return self:__degree(args) % #args.scale + 1 end
-function Vox:__val(args) return args.scale[self:__ix(args)] end
+  if args.mask then
+    local a = selector(ix, args.mask, 1, #args.scale)
+    print(a)
+  end
 
-function Vox:__pos(args) return self:__val(args) + self:__transpose(args) end
-function Vox:__neg(args) return (7 - self:__pos(args)) % 12 end
+  local pos = val
+  local neg = (7 - pos) % 12
 
-function Vox:__note(args) return (args.negharm and self:__neg(args) or self:__pos(args)) + self:__octave(args) * 12 end
+  return (args.negharm and neg or pos) + self:_octave(args) * 12
+end
+
+function Vox:_level(args) return self.level * args.level end
 
 -- functions for mulitple Vox objects
 function _set(objects, property, val)
