@@ -130,11 +130,10 @@ function Vox:__wrap(args) return args.wrap and 0 or math.floor(self:__degree(arg
 function Vox:__scale_ix(args) return self:__degree(args) % #args.scale + 1 end
 function Vox:__scale_val(args) return args.scale[self:__scale_ix(args)] end
 
-function Vox:__mask_ix(args) return self:__degree(args) % #args.scale + 1 end
+function Vox:__mask_ix(args) return selector(self:__scale_val(args), args.mask, 1, #args.scale, 1, #args.mask) end
 function Vox:__mask_val(args) return args.scale[self:__mask_ix(args)] end
 
 function Vox:__mask(args) return args.mask == nil and self:__scale_val(args) or self:__mask_val(args) end
-
 function Vox:__pos(args) return self:__mask(args) + self:__transpose(args) end
 function Vox:__neg(args) return (7 - self:__pos(args)) % 12 end
 
