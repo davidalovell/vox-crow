@@ -70,7 +70,6 @@ function Vox:new(args)
   o.transpose = args.transpose == nil and 0 or args.transpose
 
   o.scale = args.scale == nil and cv.scale or args.scale
-  o.mask = args.mask == nil and nil or args.mask
   o.wrap = args.wrap == nil and false or args.wrap
   o.negharm = args.negharm == nil and false or args.negharm
 
@@ -91,7 +90,6 @@ function Vox:set(args)
   self.transpose = args.transpose == nil and self.transpose or args.transpose
 
   self.scale = args.scale == nil and self.scale or args.scale
-  self.mask = args.mask == nil and self.mask or args.mask
   self.wrap = args.wrap == nil and self.wrap or args.wrap
   self.negharm = args.negharm == nil and self.negharm or args.negharm
 
@@ -110,7 +108,6 @@ function Vox:play(args)
   args.transpose = args.transpose == nil and 0 or args.transpose
 
   args.scale = args.scale == nil and self.scale or args.scale
-  args.mask = args.mask == nil and self.mask or args.mask
   args.wrap = args.wrap == nil and self.wrap or args.wrap
   args.negharm = args.negharm == nil and self.negharm or args.negharm
 
@@ -127,14 +124,10 @@ function Vox:__transpose(args) return self.transpose + args.transpose end
 
 function Vox:__wrap(args) return args.wrap and 0 or math.floor(self:__degree(args) / #args.scale) end
 
-function Vox:__scale_ix(args) return self:__degree(args) % #args.scale + 1 end
-function Vox:__scale_val(args) return args.scale[self:__scale_ix(args)] end
+function Vox:__ix(args) return self:__degree(args) % #args.scale + 1 end
+function Vox:__val(args) return args.scale[self:__ix(args)] end
 
-function Vox:__mask_ix(args) return selector(self:__scale_val(args), args.mask, 1, #args.scale, 1, #args.mask) end
-function Vox:__mask_val(args) return args.scale[self:__mask_ix(args)] end
-
-function Vox:__mask(args) return args.mask == nil and self:__scale_val(args) or self:__mask_val(args) end
-function Vox:__pos(args) return self:__mask(args) + self:__transpose(args) end
+function Vox:__pos(args) return self:__val(args) + self:__transpose(args) end
 function Vox:__neg(args) return (7 - self:__pos(args)) % 12 end
 
 function Vox:__note(args) return (args.negharm and self:__neg(args) or self:__pos(args)) + self:__octave(args) * 12 end
