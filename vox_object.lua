@@ -70,7 +70,6 @@ function Vox:new(args)
   o.transpose, o._transpose = args.transpose == nil and 0 or args.transpose, 0
 
   o.scale = args.scale == nil and cv.scale or args.scale
-  o.mask = args.mask == nil and nil or args.mask
   o.wrap = args.wrap == nil and false or args.wrap
   o.negharm = args.negharm == nil and false or args.negharm
 
@@ -92,7 +91,6 @@ function Vox:play(args)
   self._transpose = args.transpose == nil and self._transpose or args.transpose
 
   self.scale = args.scale == nil and self.scale or args.scale
-  self.mask = args.mask == nil and self.mask or args.mask
   self.wrap = args.wrap == nil and self.wrap or args.wrap
   self.negharm = args.negharm == nil and self.negharm or args.negharm
 
@@ -110,10 +108,8 @@ function Vox:__transpose() return self.transpose + self._transpose end
 function Vox:__wrap() return self.wrap and 0 or math.floor(self:__degree() / #self.scale) end
 
 function Vox:__val() return self.scale[self:__degree() % #self.scale + 1] end
-function Vox:__maskval() return self.scale[selector(self:__val(), self.mask, 1, #self.scale) % #self.mask + 1] end
 
-function Vox:__mask() return self.mask == nil and self:__val() or self:__maskval() end
-function Vox:__pos() return self:__mask() + self:__transpose() end
+function Vox:__pos() return self:__val() + self:__transpose() end
 function Vox:__neg() return (7 - self:__pos()) % 12 end
 
 function Vox:__note() return (self.negharm and self:__neg() or self:__pos()) + self:__octave() * 12 end
