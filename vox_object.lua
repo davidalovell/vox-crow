@@ -129,7 +129,12 @@ function Vox:__transpose(args) return self.transpose + args.transpose end
 function Vox:__wrap(args) return args.wrap and 0 or math.floor(self:__degree(args) / #self.scale) end
 
 function Vox:__val(args) return args.scale[self:__degree(args) % #args.scale + 1] end
-function Vox:__maskval(args) return args.scale[selector(self:__val(args), args.mask, 1, #args.scale)] end -- %
+function Vox:__maskval(args)
+  local r = args.scale[selector(args.scale[self:__degree(args) % #args.scale + 1], args.mask, 1, #args.scale)]
+  print(r)
+  return r
+  -- return args.scale[selector(self:__val(args), args.mask, 1, #args.scale)]
+end
 
 function Vox:__mask(args) return args.mask == nil and self:__val(args) or self:__maskval(args) end
 function Vox:__pos(args) return self:__mask(args) + self:__transpose(args) end
