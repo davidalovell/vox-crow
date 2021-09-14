@@ -110,7 +110,7 @@ function Vox:__transpose() return self.transpose + self._transpose end
 function Vox:__wrap() return self.wrap and 0 or math.floor(self:__degree() / #self.scale) end
 
 function Vox:__val() return self.scale[self:__degree() % #self.scale + 1] end
-function Vox:__maskval() return self.scale[selector(self:__val(), self.mask, 1, #self.scale)] end
+function Vox:__maskval() return self.scale[selector(self:__val(), self.mask, 1, #self.scale) % #self.mask + 1] end
 
 function Vox:__mask() return self.mask == nil and self:__val() or self:__maskval() end
 function Vox:__pos() return self:__mask() + self:__transpose() end
