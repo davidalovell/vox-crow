@@ -110,7 +110,7 @@ function Vox:play(args)
   args.transpose = args.transpose == nil and 0 or args.transpose
 
   args.scale = args.scale == nil and self.scale or args.scale
-  args.mask = args.mask == nil and self.mask or args.mask
+  args.mask = args.mask == nil and self.mask or args.mask -- doesn't work
   args.wrap = args.wrap == nil and self.wrap or args.wrap
   args.negharm = args.negharm == nil and self.negharm or args.negharm
 
@@ -119,22 +119,16 @@ function Vox:play(args)
   return self:__on(args) and args.synth(self:__note(args), self:__level(args))
 end
 
--- needs work
 function Vox:__on(args) return self.on and args.on end
 function Vox:__level(args) return self.level * args.level end
 function Vox:__octave(args) return self.octave + args.octave + self:__wrap(args) end
 function Vox:__degree(args) return (self.degree - 1) + (args.degree - 1) end
 function Vox:__transpose(args) return self.transpose + args.transpose end
 
-function Vox:__wrap(args) return args.wrap and 0 or math.floor(self:__degree(args) / #self.scale) end
+function Vox:__wrap(args) return args.wrap and 0 or math.floor(self:__degree(args) / #args.scale) end
 
 function Vox:__val(args) return args.scale[self:__degree(args) % #args.scale + 1] end
-function Vox:__maskval(args)
-  local r = args.scale[selector(args.scale[self:__degree(args) % #args.scale + 1], args.mask, 1, #args.scale)]
-  print(r)
-  return r
-  -- return args.scale[selector(self:__val(args), args.mask, 1, #args.scale)]
-end
+function Vox:__maskval(args) return args.scale[selector(self:__val(), args.mask, 1, #args.scale) % #args.mask + 1] end
 
 function Vox:__mask(args) return args.mask == nil and self:__val(args) or self:__maskval(args) end
 function Vox:__pos(args) return self:__mask(args) + self:__transpose(args) end
