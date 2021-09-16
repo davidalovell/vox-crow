@@ -13,6 +13,7 @@ aeolian = {0,2,3,5,7,8,10}
 locrian = {0,1,3,5,6,8,10}
 
 -- other scales
+chromatic = {0,1,2,3,4,5,6,7,8,9,10,11}
 whole = {0,2,4,6,8,10}
 
 -- scale mask function
@@ -111,9 +112,10 @@ function Vox:play(args)
   args.synth = (args.synth == nil and self.synth or args.synth)
 
   args.ix = args.degree % #args.scale + 1
+  args.masked_ix = (self:_mask(args) - 1) % #args.scale + 1
+  args.final_ix = args.mask == nil and args.ix or args.masked_ix
 
-  args.new_ix = args.mask == nil and args.ix or (self:_mask(args) - 1) % #args.scale + 1
-  args.val = args.scale[args.new_ix]
+  args.val = args.scale[args.final_ix]
   args.pos = args.val
   args.neg = (7 - args.val) % 12
   args.final = args.negharm and args.neg or args.pos
@@ -175,15 +177,4 @@ function selector(x, data, in_min, in_max, out_min, out_max)
   out_min = out_min or 1
   out_max = out_max or #data
   return data[ clamp( round( linlin( x, in_min, in_max, out_min, out_max ) ), out_min, out_max ) ]
-end
-
-function closest(data, x)
-  local closest_val = data[1]
-  for k, v in ipairs(data) do
-  	local current_diff, closest_diff = math.abs(v - x), math.abs(closest_val - x)
-  	if current_diff < closest_diff then
-  		closest_val = v
-  	end
-  end
-  return closest_val
 end
