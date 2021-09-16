@@ -110,15 +110,7 @@ function Vox:play(args)
   args.negharm = (args.negharm == nil and self.negharm or args.negharm)
   args.synth = (args.synth == nil and self.synth or args.synth)
 
-  args.ix = args.degree % #args.scale + 1
-
-  if args.mask then
-    for k, v in ipairs(args.mask) do
-      args.mask[k] = (args.mask[k] - 1) % #args.scale + 1
-    end
-    args.ix = closest(args.mask, args.ix)
-  end
-
+  args.ix = args.mask == nil and (args.degree % #args.scale + 1) or self:_mask(args)
   args.val = args.scale[args.ix]
   args.pos = args.val
   args.neg = (7 - args.val) % 12
@@ -126,6 +118,19 @@ function Vox:play(args)
   args.note = args.final + args.transpose + (args.octave * 12)
 
   return args.on and args.synth(args.note, args.level)
+end
+
+function Vox:_mask(args)
+  args.ix = args.degree % #args.scale + 1
+  local closest_val = args.mask[1]
+  for k, v in ipairs(args.mask) do
+    v = (v - 1) % #args.scale + 1
+  	local current_diff, closest_diff = math.abs(v - args.ix), math.abs(closest_val - args.ix)
+  	if current_diff < closest_diff then
+  		closest_val = v
+  	end
+  end
+  return closest_val
 end
 --
 
@@ -169,12 +174,12 @@ function selector(x, data, in_min, in_max, out_min, out_max)
 end
 
 function closest(data, x)
-  local closest_num = data[1]
-  for k, current_num in ipairs(data) do
-  	local current_diff, closest_diff = math.abs(current_num - x), math.abs(closest_num - x)
+  local closest_val = data[1]
+  for k, v in ipairs(data) do
+  	local current_diff, closest_diff = math.abs(v - x), math.abs(closest_val - x)
   	if current_diff < closest_diff then
-  		closest_num = current_num
+  		closest_val = v
   	end
   end
-  return closest_num
+  return closest_val
 end
