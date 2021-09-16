@@ -14,8 +14,7 @@ locrian = {0,1,3,5,6,8,10}
 
 -- other scales
 chromatic = {0,1,2,3,4,5,6,7,8,9,10,11}
-dim = {0,2,3,5,6,8,9,11}
-domdim = {0,1,3,4,6,7,9,10}
+diminished = {0,2,3,5,6,8,9,11}
 whole = {0,2,4,6,8,10}
 
 -- scale mask function
@@ -114,24 +113,25 @@ function Vox:play(args)
   args.synth = (args.synth == nil and self.synth or args.synth)
 
   args.ix = args.degree % #args.scale + 1
-  args.round_to_octave = 0
 
   if args.mask then
     local closest_val = args.mask[1]
 
-    for k, v in ipairs(args.mask) do
-      v = (v - 1) % #args.scale + 1
-      closest_val = math.abs(v - args.ix) < math.abs(closest_val - args.ix) and v or closest_val
+    for _, val in ipairs(args.mask) do
+      val = (val - 1) % #args.scale + 1
+      closest_val = math.abs(val - args.ix) < math.abs(closest_val - args.ix) and val or closest_val
     end
 
     args.ix = (closest_val - 1) % #args.scale + 1
   end
 
   args.val = args.scale[args.ix]
-  args.pos = args.val
-  args.neg = (7 - args.val) % 12
-  args.final = args.negharm and args.neg or args.pos
-  args.note = args.final + args.transpose + (args.octave * 12)
+
+  if args.negharm then
+    args.val = (7 - args.val) % 12
+  end
+
+  args.note = args.val + args.transpose + (args.octave * 12)
 
   return args.on and args.synth(args.note, args.level)
 end
