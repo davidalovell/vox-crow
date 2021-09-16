@@ -110,26 +110,30 @@ function Vox:play(args)
   args.negharm = (args.negharm == nil and self.negharm or args.negharm)
   args.synth = (args.synth == nil and self.synth or args.synth)
 
-  args.ix = args.mask == nil and (args.degree % #args.scale + 1) or self:_mask(args)
-  args.val = args.scale[args.ix]
+  args.ix = args.degree % #args.scale + 1
+
+  args.new_ix = args.mask == nil and args.ix or (self:_mask(args) - 1) % #args.scale + 1
+  args.val = args.scale[args.new_ix]
   args.pos = args.val
   args.neg = (7 - args.val) % 12
   args.final = args.negharm and args.neg or args.pos
-  args.note = args.final + args.transpose + (args.octave * 12)
+  args.note = args.final + args.transpose + (args.octave * 12) + (math.floor(self:_mask(args) / #args.scale) * 12)
 
   return args.on and args.synth(args.note, args.level)
 end
 
 function Vox:_mask(args)
-  args.ix = args.degree % #args.scale + 1
-  local closest_val = args.mask[1]
+  local closest_val, lowest_val = args.mask[1], args.mask[1]
+
   for k, v in ipairs(args.mask) do
     v = (v - 1) % #args.scale + 1
-  	local current_diff, closest_diff = math.abs(v - args.ix), math.abs(closest_val - args.ix)
-  	if current_diff < closest_diff then
-  		closest_val = v
-  	end
+    closest_val = math.abs(v - args.ix) < math.abs(closest_val - args.ix) and v or closest_val
+    lowest_val = v < lowest_val and v or lowest_val
   end
+
+  local highest_val = lowest_val + #args.scale
+  closest_val = math.abs(highest_val - args.ix) < math.abs(closest_val - args.ix) and highest_val or closest_val
+
   return closest_val
 end
 --
