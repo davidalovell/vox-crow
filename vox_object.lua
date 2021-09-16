@@ -129,7 +129,6 @@ function Vox:play(args)
     args.ix = (closest_val - 1) % #args.scale + 1
     args.round_to_octave = math.floor(closest_val / #args.scale)
   end
-  print(args.round_to_octave)
 
   args.val = args.scale[args.ix]
   args.pos = args.val
