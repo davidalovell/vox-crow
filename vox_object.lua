@@ -65,18 +65,13 @@ function Vox:new(args)
 
   o.on = args.on == nil and true or args.on
   o.level = args.level == nil and 1 or args.level
-
   o.scale = args.scale == nil and cv.scale or args.scale
   o.mask = args.mask == nil and nil or args.mask
-
   o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
-
   o.wrap = args.wrap == nil and false or args.wrap
   o.octave = args.octave == nil and 0 or args.octave
-
   o.negharm = args.negharm == nil and false or args.negharm
-
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
 
   o.seq = args.seq == nil and {} or args.seq
@@ -89,18 +84,13 @@ function Vox:set(args)
 
   self.on = args.on == nil and self.on or args.on
   self.level = args.level == nil and self.level or args.level
-
   self.scale = args.scale == nil and self.scale or args.scale
   self.mask = args.mask == nil and self.mask or args.mask
-
   self.transpose = args.transpose == nil and self.transpose or args.transpose
   self.degree = args.degree == nil and self.degree or args.degree
-
   self.wrap = args.wrap == nil and self.wrap or args.wrap
   self.octave = args.octave == nil and self.octave or args.octave
-
   self.negharm = args.negharm == nil and self.negharm or args.negharm
-
   self.synth = args.synth == nil and self.synth or args.synth
 
   self.seq = args.seq == nil and {} or args.seq
@@ -111,16 +101,12 @@ function Vox:play(args)
 
   args.on = self.on and (args.on == nil and true or args.on)
   args.level = self.level * (args.level == nil and 1 or args.level)
-
   args.scale = (args.scale == nil and self.scale or args.scale)
   args.mask = (args.mask == nil and self.mask or args.mask)
-
   args.transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
   args.degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
-
   args.wrap = (args.wrap == nil and self.wrap or args.wrap) and 0 or math.floor(args.degree / #args.scale)
   args.octave = self.octave + (args.octave == nil and 0 or args.octave) + args.wrap
-
   args.negharm = (args.negharm == nil and self.negharm or args.negharm)
   args.synth = (args.synth == nil and self.synth or args.synth)
 
@@ -134,12 +120,9 @@ function Vox:play(args)
   end
 
   args.val = args.scale[args.ix]
-
   args.pos = args.val
   args.neg = (7 - args.val) % 12
-
   args.final = args.negharm and args.neg or args.pos
-
   args.note = args.final + args.transpose + (args.octave * 12)
 
   return args.on and args.synth(args.note, args.level)
@@ -185,13 +168,13 @@ function selector(x, data, in_min, in_max, out_min, out_max)
   return data[ clamp( round( linlin( x, in_min, in_max, out_min, out_max ) ), out_min, out_max ) ]
 end
 
-function closest(numberTable, number)
-  local closestNum = numberTable[1]
-  for i, currentNum in pairs(numberTable) do
-  	local currentDiff, closestDiff = math.abs(currentNum - number), math.abs(closestNum - number)
-  	if currentDiff < closestDiff then
-  		closestNum = currentNum
+function closest(data, x)
+  local closest_num = data[1]
+  for k, current_num in ipairs(data) do
+  	local current_diff, closest_diff = math.abs(current_num - x), math.abs(closest_num - x)
+  	if current_diff < closest_diff then
+  		closest_num = current_num
   	end
   end
-  return closestNum
+  return closest_num
 end
