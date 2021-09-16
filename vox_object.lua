@@ -65,13 +65,16 @@ function Vox:new(args)
 
   o.on = args.on == nil and true or args.on
   o.level = args.level == nil and 1 or args.level
-  o.octave = args.octave == nil and 0 or args.octave
-  o.degree = args.degree == nil and 1 or args.degree
-  o.transpose = args.transpose == nil and 0 or args.transpose
 
   o.scale = args.scale == nil and cv.scale or args.scale
   o.mask = args.mask == nil and nil or args.mask
+
+  o.transpose = args.transpose == nil and 0 or args.transpose
+  o.degree = args.degree == nil and 1 or args.degree
+
   o.wrap = args.wrap == nil and false or args.wrap
+  o.octave = args.octave == nil and 0 or args.octave
+
   o.negharm = args.negharm == nil and false or args.negharm
 
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
@@ -86,13 +89,16 @@ function Vox:set(args)
 
   self.on = args.on == nil and self.on or args.on
   self.level = args.level == nil and self.level or args.level
-  self.octave = args.octave == nil and self.octave or args.octave
-  self.degree = args.degree == nil and self.degree or args.degree
-  self.transpose = args.transpose == nil and self.transpose or args.transpose
 
   self.scale = args.scale == nil and self.scale or args.scale
   self.mask = args.mask == nil and self.mask or args.mask
+
+  self.transpose = args.transpose == nil and self.transpose or args.transpose
+  self.degree = args.degree == nil and self.degree or args.degree
+
   self.wrap = args.wrap == nil and self.wrap or args.wrap
+  self.octave = args.octave == nil and self.octave or args.octave
+
   self.negharm = args.negharm == nil and self.negharm or args.negharm
 
   self.synth = args.synth == nil and self.synth or args.synth
@@ -103,44 +109,45 @@ end
 function Vox:play(args)
   local args = args == nil and {} or args
 
-  args.on = args.on == nil and true or args.on
-  args.level = args.level == nil and 1 or args.level
-  args.octave = args.octave == nil and 0 or args.octave
-  args.degree = args.degree == nil and 1 or args.degree
-  args.transpose = args.transpose == nil and 0 or args.transpose
+  args.on = self.on and (args.on == nil and true or args.on)
+  args.level = self.level * (args.level == nil and 1 or args.level)
 
-  args.scale = args.scale == nil and self.scale or args.scale
-  args.mask = args.mask == nil and self.mask or args.mask
-  args.wrap = args.wrap == nil and self.wrap or args.wrap
-  args.negharm = args.negharm == nil and self.negharm or args.negharm
+  args.scale = (args.scale == nil and self.scale or args.scale)
+  args.mask = (args.mask == nil and self.mask or args.mask)
 
-  args.synth = args.synth == nil and self.synth or args.synth
+  args.transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
+  args.degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
 
-  return self:_on(args) and args.synth(self:_note(args), self:_level(args))
-end
+  args.wrap = (args.wrap == nil and self.wrap or args.wrap) and 0 or math.floor(args.degree / #args.scale)
+  args.octave = self.octave + (args.octave == nil and 0 or args.octave) + args.wrap
 
-function Vox:_on(args) return self.on and args.on end
-function Vox:_transpose(args) return self.transpose + args.transpose end
-function Vox:_degree(args) return (self.degree - 1) + (args.degree - 1) end
-function Vox:_wrap(args) return args.wrap and 0 or math.floor(self:_degree(args) / #args.scale) end
-function Vox:_octave(args) return self.octave + args.octave + self:_wrap(args) end
+  args.negharm = (args.negharm == nil and self.negharm or args.negharm)
+  args.synth = (args.synth == nil and self.synth or args.synth)
 
-function Vox:_note(args)
-  local ix = self:_degree(args) % #args.scale + 1
-  local val = args.scale[ix] + self:_transpose(args)
+  args.ix = args.degree % #args.scale + 1
 
   if args.mask then
-    local a = selector(ix, args.mask, 1, #args.scale)
-    print(a)
+    for k, v in ipairs(args.mask) do
+      args.mask[k] = (args.mask[k] - 1) % #args.scale + 1
+    end
+    args.ix = closest(args.mask, args.ix)
   end
 
-  local pos = val
-  local neg = (7 - pos) % 12
+  args.val = args.scale[args.ix]
 
-  return (args.negharm and neg or pos) + self:_octave(args) * 12
+  args.pos = args.val
+  args.neg = (7 - args.val) % 12
+
+  args.final = args.negharm and args.neg or args.pos
+
+  args.note = args.final + args.transpose + (args.octave * 12)
+
+  return args.on and args.synth(args.note, args.level)
 end
+--
 
-function Vox:_level(args) return self.level * args.level end
+
+
 
 -- functions for mulitple Vox objects
 function _set(objects, property, val)
@@ -159,7 +166,7 @@ end
 
 
 
-
+-- helper functions
 function clamp(x, min, max)
   return math.min( math.max( min, x ), max )
 end
@@ -176,4 +183,15 @@ function selector(x, data, in_min, in_max, out_min, out_max)
   out_min = out_min or 1
   out_max = out_max or #data
   return data[ clamp( round( linlin( x, in_min, in_max, out_min, out_max ) ), out_min, out_max ) ]
+end
+
+function closest(numberTable, number)
+  local closestNum = numberTable[1]
+  for i, currentNum in pairs(numberTable) do
+  	local currentDiff, closestDiff = math.abs(currentNum - number), math.abs(closestNum - number)
+  	if currentDiff < closestDiff then
+  		closestNum = currentNum
+  	end
+  end
+  return closestNum
 end
