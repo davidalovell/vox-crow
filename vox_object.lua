@@ -115,26 +115,26 @@ function Vox:play(args)
   args.round_to_octave = 0
 
   if args.mask then
-    local closest_val, lowest_val = args.mask[1], args.mask[1]
+    local closest_val--[[, lowest_val ]]= --[[args.mask[1], ]]args.mask[1]
 
     for k, v in ipairs(args.mask) do
       v = (v - 1) % #args.scale + 1
       closest_val = math.abs(v - args.ix) < math.abs(closest_val - args.ix) and v or closest_val
-      lowest_val = v < lowest_val and v or lowest_val
+      -- lowest_val = v < lowest_val and v or lowest_val
     end
 
-    local highest_val = lowest_val + #args.scale
-    closest_val = math.abs(highest_val - args.ix) < math.abs(closest_val - args.ix) and highest_val or closest_val
+    -- local highest_val = lowest_val + #args.scale
+    -- closest_val = math.abs(highest_val - args.ix) < math.abs(closest_val - args.ix) and highest_val or closest_val
 
     args.ix = (closest_val - 1) % #args.scale + 1
-    args.round_to_octave = math.floor(closest_val / #args.scale)
+    -- args.round_to_octave = math.floor(closest_val / #args.scale)
   end
 
   args.val = args.scale[args.ix]
   args.pos = args.val
   args.neg = (7 - args.val) % 12
   args.final = args.negharm and args.neg or args.pos
-  args.note = args.final + args.transpose + (args.octave * 12) + (args.round_to_octave * 12)
+  args.note = args.final + args.transpose + (args.octave * 12) --[[+ (args.round_to_octave * 12)]]
 
   return args.on and args.synth(args.note, args.level)
 end
