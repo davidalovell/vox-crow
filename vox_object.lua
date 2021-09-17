@@ -142,7 +142,7 @@ function Vox:apply_wrap(args)
 end
 
 function Vox:apply_mask(args)
-  args.mask[#args.mask + 1] = args.mask[1]
+  -- args.mask[#args.mask + 1] = args.mask[1] + #args.scale
 
   local ix = args.degree % #args.scale + 1
   local closest_val = args.mask[1]
