@@ -123,13 +123,13 @@ function Vox:play(args)
   args.ix = args.degree % #args.scale + 1
 
   if args.mask then
-    args.mask[#args.mask + 1] = args.mask[1]
+    args.mask[#args.mask + 1] = args.mask[1] + #args.scale
     local closest_val = args.mask[1]
     for _, val in ipairs(args.mask) do
-      val = (val - 1) % #args.scale + 1
       closest_val = math.abs(val - args.ix) < math.abs(closest_val - args.ix) and val or closest_val
     end
     args.ix = (closest_val - 1) % #args.scale + 1
+    args.octave = args.octave + math.floor((closest_val - 1) / #args.scale)
   end
 
   args.val = args.scale[args.ix]
