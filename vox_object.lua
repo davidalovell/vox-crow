@@ -116,7 +116,7 @@ function Vox:play(args)
   args.wrap = args.wrap == nil and self.wrap or args.wrap
   args.negharm = args.negharm == nil and self.negharm or args.negharm
 
-  args.degree = args.mask and self:apply_mask(args) or args.degree
+  args.degree = args.mask and (self:apply_mask(args) - 1) or args.degree
   args.octave = not args.wrap and self:apply_wrap(args) or args.octave
 
   args.ix = args.degree % #args.scale + 1
@@ -136,7 +136,7 @@ function Vox:apply_mask(args)
     closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
   end
 
-  return (closest_val - 1)
+  return closest_val
 end
 
 function Vox:apply_wrap(args)
