@@ -124,36 +124,12 @@ function Vox:play(args)
   args.ix = args.degree % #args.scale + 1
 
 
-  if args.mask then
-    -- error: i am not sure why this happens
-    -- a:play{mask = {7}, degree = 8} = 22
-    -- for some reason if ANY value is 7 then the result is 22
-
+  if args.mask then  -- rounds down only
     local closest_val = args.mask[1]
-    local lowest_val = args.mask[1] --
-
-    print('')
-    for _, val in ipairs(args.mask) do
-      print('key', _, 'val', val)
-      val = (val - 1) % #args.scale + 1
-      print('val', val)
+    for _, val in ipairs(args.mask) do      val = (val - 1) % #args.scale + 1
       closest_val = math.abs(val - args.ix) < math.abs(closest_val - args.ix) and val or closest_val
-      print('closest_val', closest_val)
-      lowest_val = val < lowest_val and val or lowest_val
-      print('lowest_val', lowest_val)
     end
-
-    local highest_val = lowest_val + #args.scale --
-    print('highest_val', highest_val)
-    closest_val = math.abs(highest_val - args.ix) < math.abs(closest_val - args.ix) --
-      and highest_val
-      or closest_val
-    print('closest_val', closest_val)
-
     args.ix = (closest_val - 1) % #args.scale + 1
-    print('args.ix', args.ix)
-    args.octave = args.octave + math.floor((closest_val - 1)/ #args.scale) -- 1st fix, only works for one octave
-    print('args.octave', args.octave)
   end
 
 
