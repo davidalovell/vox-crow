@@ -59,7 +59,7 @@ cv = {
 
 
 -- Vox object
--- DL, last modified 2021-09-13
+-- DL, last modified 2021-09-17
 
 Vox = {}
 function Vox:new(args)
@@ -142,15 +142,6 @@ function Vox:play(args)
 
   return args.on and args.synth(args.note, args.level)
 end
---
--- function Vox:apply_wrap(args)
--- end
---
--- function Vox:apply_mask(args)
--- end
---
--- function Vox:apply_negharm(args)
--- end
 --
 
 
