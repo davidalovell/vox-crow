@@ -117,40 +117,47 @@ function Vox:play(args)
   args.negharm = args.negharm == nil and self.negharm or args.negharm
 
   if not args.wrap then
-    args.octave = args.octave + math.floor(args.degree / #args.scale)
+    args.octave = self:apply_wrap(args)
   end
-
-  args.ix = args.degree % #args.scale + 1
 
   if args.mask then
-    args.mask[#args.mask + 1] = args.mask[1]
-    local closest_val = args.mask[1]
-    for _, val in ipairs(args.mask) do
-      val = (val - 1) % #args.scale + 1
-      closest_val = math.abs(val - args.ix) < math.abs(closest_val - args.ix) and val or closest_val
-    end
-    args.ix = (closest_val - 1) % #args.scale + 1
+    args.ix = self:apply_mask(args)
+  else
+    args.ix = args.degree % #args.scale + 1
   end
 
-  args.val = args.scale[args.ix]
-
   if args.negharm then
-    args.val = (7 - args.val) % 12
+    args.val = self:apply_negharm(args)
+  else
+    args.val = args.scale[args.ix]
   end
 
   args.note = args.val + args.transpose + (args.octave * 12)
 
   return args.on and args.synth(args.note, args.level)
 end
---
--- function Vox:apply_wrap(args)
--- end
---
--- function Vox:apply_mask(args)
--- end
---
--- function Vox:apply_negharm(args)
--- end
+
+function Vox:apply_wrap(args)
+  return args.octave + math.floor(args.degree / #args.scale)
+end
+
+function Vox:apply_mask(args)
+  args.mask[#args.mask + 1] = args.mask[1]
+
+  local ix = args.degree % #args.scale + 1
+  local closest_val = args.mask[1]
+
+  for _, val in ipairs(args.mask) do
+    val = (val - 1) % #args.scale + 1
+    closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
+  end
+
+  return (closest_val - 1) % #args.scale + 1
+end
+
+function Vox:apply_negharm(args)
+  return (7 - args.val) % 12
+end
 --
 
 
