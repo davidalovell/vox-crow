@@ -115,51 +115,41 @@ function Vox:play(args)
   args.mask = args.mask == nil and self.mask or args.mask
   args.negharm = args.negharm == nil and self.negharm or args.negharm
 
-
   if not args.wrap then
     args.octave = args.octave + math.floor(args.degree / #args.scale)
   end
 
-
   args.ix = args.degree % #args.scale + 1
 
-
-  if args.mask then  -- rounds down only
+  if args.mask then
+    args.mask[#args.mask + 1] = args.mask[1] -- this allows for rounding up
     local closest_val = args.mask[1]
     for _, val in ipairs(args.mask) do
       val = (val - 1) % #args.scale + 1
-
-      current_diff = math.abs(val - args.ix)
-      closest_diff = math.abs(closest_val - args.ix)
-
-      closest_val = current_diff < closest_diff and val or closest_val
+      closest_val = math.abs(val - args.ix) < math.abs(closest_val - args.ix) and val or closest_val
     end
     args.ix = (closest_val - 1) % #args.scale + 1
   end
 
-
   args.val = args.scale[args.ix]
-
 
   if args.negharm then
     args.val = (7 - args.val) % 12
   end
 
-
   args.note = args.val + args.transpose + (args.octave * 12)
-
 
   return args.on and args.synth(args.note, args.level)
 end
-
-function Vox:apply_wrap(args)
-end
-
-function Vox:apply_mask(args)
-end
-
-function Vox:apply_negharm(args)
-end
+--
+-- function Vox:apply_wrap(args)
+-- end
+--
+-- function Vox:apply_mask(args)
+-- end
+--
+-- function Vox:apply_negharm(args)
+-- end
 --
 
 
