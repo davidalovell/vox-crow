@@ -142,17 +142,17 @@ function Vox:apply_wrap(args)
 end
 
 function Vox:apply_mask(args)
-  -- args.mask[#args.mask + 1] = args.mask[1] + #args.scale
+  args.mask[#args.mask + 1] = args.mask[1] + #args.scale
 
   local ix = args.degree % #args.scale + 1
   local closest_val = args.mask[1]
 
   for _, val in ipairs(args.mask) do
-    val = (val - 1) % #args.scale + 1
     closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
   end
 
-  return (closest_val - 1) % #args.scale + 1
+
+  return (closest_val - 1) % #args.scale + 1--, math.floor((closest_val - 1) / #args.scale)
 end
 
 function Vox:apply_negharm(args)
