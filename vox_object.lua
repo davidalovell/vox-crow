@@ -126,8 +126,13 @@ function Vox:play(args)
 
   if args.mask then  -- rounds down only
     local closest_val = args.mask[1]
-    for _, val in ipairs(args.mask) do      val = (val - 1) % #args.scale + 1
-      closest_val = math.abs(val - args.ix) < math.abs(closest_val - args.ix) and val or closest_val
+    for _, val in ipairs(args.mask) do
+      val = (val - 1) % #args.scale + 1
+
+      current_diff = math.abs(val - args.ix)
+      closest_diff = math.abs(closest_val - args.ix)
+
+      closest_val = current_diff < closest_diff and val or closest_val
     end
     args.ix = (closest_val - 1) % #args.scale + 1
   end
