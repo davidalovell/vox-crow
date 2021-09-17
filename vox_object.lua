@@ -126,7 +126,7 @@ function Vox:play(args)
 
   if args.mask then
     -- error: i am not sure why this happens
-    -- a:play{mask = {1,7}, degree = 5} = 22
+    -- a:play{mask = {7}, degree = 8} = 22
     -- for some reason if ANY value is 7 then the result is 22
 
     local closest_val = args.mask[1]
@@ -152,7 +152,7 @@ function Vox:play(args)
 
     args.ix = (closest_val - 1) % #args.scale + 1
     print('args.ix', args.ix)
-    args.octave = args.octave + math.floor(closest_val / #args.scale)
+    args.octave = args.octave + math.floor((closest_val - 1)/ #args.scale) -- 1st fix, only works for one octave
     print('args.octave', args.octave)
   end
 
