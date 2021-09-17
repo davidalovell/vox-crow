@@ -68,13 +68,14 @@ function Vox:new(args)
   o.on = args.on == nil and true or args.on
   o.level = args.level == nil and 1 or args.level
   o.scale = args.scale == nil and cv.scale or args.scale
-  o.mask = args.mask == nil and nil or args.mask
   o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
-  o.wrap = args.wrap == nil and false or args.wrap
   o.octave = args.octave == nil and 0 or args.octave
-  o.negharm = args.negharm == nil and false or args.negharm
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
+
+  o.wrap = args.wrap == nil and false or args.wrap
+  o.mask = args.mask == nil and nil or args.mask
+  o.negharm = args.negharm == nil and false or args.negharm
 
   o.seq = args.seq == nil and {} or args.seq
 
@@ -87,13 +88,14 @@ function Vox:set(args)
   self.on = args.on == nil and self.on or args.on
   self.level = args.level == nil and self.level or args.level
   self.scale = args.scale == nil and self.scale or args.scale
-  self.mask = args.mask == nil and self.mask or args.mask
   self.transpose = args.transpose == nil and self.transpose or args.transpose
   self.degree = args.degree == nil and self.degree or args.degree
-  self.wrap = args.wrap == nil and self.wrap or args.wrap
   self.octave = args.octave == nil and self.octave or args.octave
-  self.negharm = args.negharm == nil and self.negharm or args.negharm
   self.synth = args.synth == nil and self.synth or args.synth
+
+  self.wrap = args.wrap == nil and self.wrap or args.wrap
+  self.mask = args.mask == nil and self.mask or args.mask
+  self.negharm = args.negharm == nil and self.negharm or args.negharm
 
   self.seq = args.seq == nil and {} or args.seq
 end
@@ -103,37 +105,70 @@ function Vox:play(args)
 
   args.on = self.on and (args.on == nil and true or args.on)
   args.level = self.level * (args.level == nil and 1 or args.level)
-  args.scale = (args.scale == nil and self.scale or args.scale)
-  args.mask = (args.mask == nil and self.mask or args.mask)
+  args.scale = args.scale == nil and self.scale or args.scale
   args.transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
   args.degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
-  args.wrap = (args.wrap == nil and self.wrap or args.wrap) and 0 or math.floor(args.degree / #args.scale)
-  args.octave = self.octave + (args.octave == nil and 0 or args.octave) + args.wrap
-  args.negharm = (args.negharm == nil and self.negharm or args.negharm)
-  args.synth = (args.synth == nil and self.synth or args.synth)
+  args.octave = self.octave + (args.octave == nil and 0 or args.octave)
+  args.synth = args.synth == nil and self.synth or args.synth
+
+  args.wrap = args.wrap == nil and self.wrap or args.wrap
+  args.mask = args.mask == nil and self.mask or args.mask
+  args.negharm = args.negharm == nil and self.negharm or args.negharm
+
+
+  if not args.wrap then
+    args.octave = args.octave + math.floor(args.degree / #args.scale)
+  end
+
 
   args.ix = args.degree % #args.scale + 1
 
+
   if args.mask then
+    -- error: i am not sure why this happens
+    -- a:play{mask = {1,7}, degree = 5} = 22
+    -- for some reason if ANY value is 7 then the result is 22
+
     local closest_val = args.mask[1]
+    local lowest_val = args.mask[1] --
 
     for _, val in ipairs(args.mask) do
       val = (val - 1) % #args.scale + 1
       closest_val = math.abs(val - args.ix) < math.abs(closest_val - args.ix) and val or closest_val
+      lowest_val = val < lowest_val and val or lowest_val
     end
 
+    local highest_val = lowest_val + #args.scale --
+    closest_val = math.abs(highest_val - args.ix) < math.abs(closest_val - args.ix) --
+      and highest_val
+      or closest_val
+
     args.ix = (closest_val - 1) % #args.scale + 1
+    args.octave = args.octave + math.floor(closest_val / #args.scale)
   end
 
+
   args.val = args.scale[args.ix]
+
 
   if args.negharm then
     args.val = (7 - args.val) % 12
   end
 
+
   args.note = args.val + args.transpose + (args.octave * 12)
 
+
   return args.on and args.synth(args.note, args.level)
+end
+
+function Vox:apply_wrap(args)
+end
+
+function Vox:apply_mask(args)
+end
+
+function Vox:apply_negharm(args)
 end
 --
 
