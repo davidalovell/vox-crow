@@ -125,7 +125,7 @@ function Vox:play(args)
   note = val + transpose + (octave * 12)
   return on and synth(note, level)
 end
---
+
 function Vox.apply_mask(ix, octave, scale, mask)
   mask[#mask + 1] = mask[1] + #scale
   local closest_val = mask[1]
