@@ -103,57 +103,60 @@ end
 
 function Vox:play(args)
   local args = args == nil and {} or args
+  local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
 
-  args.on = self.on and (args.on == nil and true or args.on)
-  args.level = self.level * (args.level == nil and 1 or args.level)
-  args.scale = args.scale == nil and self.scale or args.scale
-  args.transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
-  args.degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
-  args.octave = self.octave + (args.octave == nil and 0 or args.octave)
-  args.synth = args.synth == nil and self.synth or args.synth
+  on = self.on and (args.on == nil and true or args.on)
+  level = self.level * (args.level == nil and 1 or args.level)
+  scale = args.scale == nil and self.scale or args.scale
+  transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
+  degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
+  octave = self.octave + (args.octave == nil and 0 or args.octave)
+  synth = args.synth == nil and self.synth or args.synth
 
-  args.wrap = args.wrap == nil and self.wrap or args.wrap
-  args.mask = args.mask == nil and self.mask or args.mask
-  args.negharm = args.negharm == nil and self.negharm or args.negharm
+  wrap = args.wrap == nil and self.wrap or args.wrap
+  mask = args.mask == nil and self.mask or args.mask
+  negharm = args.negharm == nil and self.negharm or args.negharm
 
-  args.ix = args.degree % #args.scale + 1
+  ix = degree % #scale + 1
 
-  if args.mask then
-    args.ix, args.octave = self.apply_mask(args)
+  if mask then
+    ix, octave = self.apply_mask(ix, octave, mask, scale)
   end
 
-  if not args.wrap then
-    args.octave = self.apply_wrap(args)
+  if not wrap then
+    octave = self.apply_wrap(octave, degree, scale)
   end
 
-  args.val = args.scale[args.ix]
+  val = scale[ix]
 
-  if args.negharm then
-    args.val = self.apply_negharm(args)
+  if negharm then
+    val = self.apply_negharm(val)
   end
 
-  args.note = args.val + args.transpose + (args.octave * 12)
+  note = val + transpose + (octave * 12)
 
-  return args.on and args.synth(args.note, args.level)
+  return on and synth(note, level)
 end
 --
-function Vox.apply_mask(args)
-  args.mask[#args.mask + 1] = args.mask[1] + #args.scale
-  local closest_val = args.mask[1]
-  for _, val in ipairs(args.mask) do
-    closest_val = math.abs(val - args.ix) < math.abs(closest_val - args.ix) and val or closest_val
+function Vox.apply_mask(ix, octave, mask, scale)
+  mask[#mask + 1] = mask[1] + #scale
+  local closest_val = mask[1]
+
+  for _, val in ipairs(mask) do
+    closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
   end
-  args.ix = (closest_val - 1) % #args.scale + 1
-  args.octave = args.octave + math.floor((closest_val - 1) / #args.scale)
-  return args.ix, args.octave
+
+  local ix, octave = (closest_val - 1) % #scale + 1, octave + math.floor((closest_val - 1) / #scale)
+
+  return ix, octave
 end
 
-function Vox.apply_wrap(args)
-  return args.octave + math.floor(args.degree / #args.scale)
+function Vox.apply_wrap(octave, degree, scale)
+  return octave + math.floor(degree / #scale)
 end
 
-function Vox.apply_negharm(args)
-  return (7 - args.val) % 12
+function Vox.apply_negharm(val)
+  return (7 - val) % 12
 end
 
 
