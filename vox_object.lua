@@ -74,9 +74,9 @@ function Vox:new(args)
   o.octave = args.octave == nil and 0 or args.octave
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
 
-  o.mask = args.mask -- args.mask == nil and nil or args.mask
-  o.wrap = args.wrap ~= nil and args.wrap or false -- args.wrap == nil and false or args.wrap
-  o.negharm = args.negharm ~= nil and args.negharm or false -- args.negharm == nil and false or args.negharm
+  o.mask = args.mask
+  o.wrap = args.wrap ~= nil and args.wrap or false
+  o.negharm = args.negharm ~= nil and args.negharm or false
 
   o.seq = args.seq == nil and {} or args.seq
 
@@ -112,7 +112,7 @@ function Vox:play(args)
   args.octave = self.octave + (args.octave == nil and 0 or args.octave)
   args.synth = args.synth == nil and self.synth or args.synth
 
-  args.wrap = args.wrap = nil and self.wrap or args.wrap
+  args.wrap = args.wrap == nil and self.wrap or args.wrap
   args.mask = args.mask == nil and self.mask or args.mask
   args.negharm = args.negharm == nil and self.negharm or args.negharm
 
