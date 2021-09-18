@@ -75,8 +75,8 @@ function Vox:new(args)
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
 
   o.mask = args.mask == nil and nil or args.mask
-  o.wrap = args.wrap == nil and false or args.wrap
-  o.negharm = args.negharm == nil and false or args.negharm
+  o.wrap = args.wrap ~= nil and args.wrap or false
+  o.negharm = args.negharm ~= nil and args.negharm or false
 
   o.seq = args.seq == nil and {} or args.seq
 
@@ -141,7 +141,6 @@ function Vox.apply_mask(degree, mask, scale)
 end
 
 function Vox.apply_wrap(degree, scale)
-  print(degree, #scale, degree / #scale)
   return math.floor(degree / #scale)
 end
 
