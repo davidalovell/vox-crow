@@ -120,11 +120,11 @@ function Vox:play(args)
   ix = degree % #scale + 1
 
   if mask then
-    ix, octave = self.apply_mask(ix, octave, mask, scale)
+    ix, octave = self.apply_mask(ix, octave, scale, mask)
   end
 
   if not wrap then
-    octave = self.apply_wrap(octave, degree, scale)
+    octave = self.apply_wrap(degree, octave, scale)
   end
 
   val = scale[ix]
@@ -134,11 +134,10 @@ function Vox:play(args)
   end
 
   note = val + transpose + (octave * 12)
-
   return on and synth(note, level)
 end
 --
-function Vox.apply_mask(ix, octave, mask, scale)
+function Vox.apply_mask(ix, octave, scale, mask)
   mask[#mask + 1] = mask[1] + #scale
   local closest_val = mask[1]
 
@@ -147,17 +146,17 @@ function Vox.apply_mask(ix, octave, mask, scale)
   end
 
   local ix, octave = (closest_val - 1) % #scale + 1, octave + math.floor((closest_val - 1) / #scale)
-
   return ix, octave
 end
 
-function Vox.apply_wrap(octave, degree, scale)
+function Vox.apply_wrap(degree, octave, scale)
   return octave + math.floor(degree / #scale)
 end
 
 function Vox.apply_negharm(val)
   return (7 - val) % 12
 end
+--
 
 
 
