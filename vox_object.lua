@@ -74,8 +74,8 @@ function Vox:new(args)
   o.octave = args.octave == nil and 0 or args.octave
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
 
-  o.wrap = args.wrap == nil and false or args.wrap
   o.mask = args.mask == nil and nil or args.mask
+  o.wrap = args.wrap == nil and false or args.wrap
   o.negharm = args.negharm == nil and false or args.negharm
 
   o.seq = args.seq == nil and {} or args.seq
@@ -94,8 +94,8 @@ function Vox:set(args)
   self.octave = args.octave == nil and self.octave or args.octave
   self.synth = args.synth == nil and self.synth or args.synth
 
-  self.wrap = args.wrap == nil and self.wrap or args.wrap
   self.mask = args.mask == nil and self.mask or args.mask
+  self.wrap = args.wrap == nil and self.wrap or args.wrap
   self.negharm = args.negharm == nil and self.negharm or args.negharm
 
   self.seq = args.seq == nil and {} or args.seq
@@ -116,10 +116,6 @@ function Vox:play(args)
   args.mask = args.mask == nil and self.mask or args.mask
   args.negharm = args.negharm == nil and self.negharm or args.negharm
 
-  if not args.wrap then
-    args.octave = args.octave + math.floor(args.degree / #args.scale)
-  end
-
   args.ix = args.degree % #args.scale + 1
 
   if args.mask then
@@ -130,6 +126,10 @@ function Vox:play(args)
     end
     args.ix = (closest_val - 1) % #args.scale + 1
     args.octave = args.octave + math.floor((closest_val - 1) / #args.scale)
+  end
+
+  if not args.wrap then
+    args.octave = args.octave + math.floor(args.degree / #args.scale)
   end
 
   args.val = args.scale[args.ix]
