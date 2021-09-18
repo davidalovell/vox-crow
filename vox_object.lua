@@ -118,21 +118,10 @@ function Vox:play(args)
   negharm = args.negharm == nil and self.negharm or args.negharm
 
   ix = degree % #scale + 1
-
-  if mask then
-    ix, octave = self.apply_mask(ix, octave, scale, mask)
-  end
-
-  if not wrap then
-    octave = self.apply_wrap(degree, octave, scale)
-  end
-
+  if mask then ix, octave = self.apply_mask(ix, octave, scale, mask) end
+  if not wrap then octave = self.apply_wrap(degree, octave, scale) end
   val = scale[ix]
-
-  if negharm then
-    val = self.apply_negharm(val)
-  end
-
+  if negharm then val = self.apply_negharm(val) end
   note = val + transpose + (octave * 12)
   return on and synth(note, level)
 end
@@ -149,13 +138,8 @@ function Vox.apply_mask(ix, octave, scale, mask)
   return ix, octave
 end
 
-function Vox.apply_wrap(degree, octave, scale)
-  return octave + math.floor(degree / #scale)
-end
-
-function Vox.apply_negharm(val)
-  return (7 - val) % 12
-end
+function Vox.apply_wrap(degree, octave, scale) return octave + math.floor(degree / #scale) end
+function Vox.apply_negharm(val) return (7 - val) % 12 end
 --
 
 
