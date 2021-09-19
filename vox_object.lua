@@ -1,7 +1,7 @@
 --- Vox
 
+
 -- scales
--- DL, last modified 2021-09-12
 
 -- modes
 ionian = {0,2,4,5,7,9,11}
@@ -37,16 +37,6 @@ japanese = mask(phrygian, {1,2,4,5,6})
 --
 
 
-
-
--- divisions
-divs = {1/32, 1/16, 1/8, 1/4, 1/2, 1, 2, 4, 8, 16, 32}
---
-
-
-
-
-
 -- initial values
 cv = {
   scale = mixolydian,
@@ -56,11 +46,8 @@ cv = {
 --
 
 
-
-
 -- Vox object
--- DL, last modified 2021-09-13
-
+-- DL, last modified 2021-09-19
 Vox = {}
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
@@ -143,8 +130,6 @@ function Vox.apply_negharm(val) return (7 - val) % 12 end
 --
 
 
-
-
 -- functions for mulitple Vox objects
 function _set(objects, property, val)
   for k, v in pairs(objects) do
@@ -158,25 +143,3 @@ function _do(objects, method, args)
   end
 end
 --
-
-
-
-
--- helper functions
-function clamp(x, min, max)
-  return math.min( math.max( min, x ), max )
-end
-
-function round(x)
-  return x % 1 >= 0.5 and math.ceil(x) or math.floor(x)
-end
-
-function linlin(x, in_min, in_max, out_min, out_max)
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-end
-
-function selector(x, data, in_min, in_max, out_min, out_max)
-  out_min = out_min or 1
-  out_max = out_max or #data
-  return data[ clamp( round( linlin( x, in_min, in_max, out_min, out_max ) ), out_min, out_max ) ]
-end
