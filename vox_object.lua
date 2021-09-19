@@ -105,27 +105,24 @@ function Vox:play(args)
   negharm = args.negharm == nil and self.negharm or args.negharm
 
   ix = degree % #scale + 1
-  if mask then ix, octave = self.apply_mask(ix, octave, scale, mask) end
-  if not wrap then octave = self.apply_wrap(degree, octave, scale) end
+  if mask then ix = self.apply_mask(ix, scale, mask) end
+  if not wrap then octave = octave + self.apply_wrap(degree, scale) end
   val = scale[ix]
   if negharm then val = self.apply_negharm(val) end
   note = val + transpose + (octave * 12)
   return on and synth(note, level)
 end
 
-function Vox.apply_mask(ix, octave, scale, mask)
-  mask[#mask + 1] = mask[1] + #scale
+function Vox.apply_mask(ix, scale, mask)
   local closest_val = mask[1]
-
   for _, val in ipairs(mask) do
+    val = (val - 1) % #scale + 1
     closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
   end
-
-  local ix, octave = (closest_val - 1) % #scale + 1, octave + math.floor((closest_val - 1) / #scale)
-  return ix, octave
+  return (closest_val - 1) % #scale + 1
 end
 
-function Vox.apply_wrap(degree, octave, scale) return octave + math.floor(degree / #scale) end
+function Vox.apply_wrap(degree, scale) return math.floor(degree / #scale) end
 function Vox.apply_negharm(val) return (7 - val) % 12 end
 --
 
