@@ -86,11 +86,15 @@ function Vox:play(args)
   mask = args.mask == nil and self.mask or args.mask -- this is wrong
   negharm = args.negharm == nil and self.negharm or args.negharm
 
-  ix = degree % #scale + 1
-  if mask then ix = self.apply_mask(ix, scale, mask) end
-  if not wrap then octave = octave + self.apply_wrap(degree, scale) end
-  val = scale[ix]
-  if negharm then val = self.apply_negharm(val) end
+  -- ix = degree % #scale + 1
+  -- if mask then ix = self.apply_mask(ix, scale, mask) end
+  ix = mask and self.apply_mask(degree % #scale + 1, scale, mask) or degree % #scale + 1
+  octave = wrap and octave or octave + self.apply_wrap(degree, scale)
+  -- if not wrap then octave = octave + self.apply_wrap(degree, scale) end
+  -- val = scale[ix]
+  -- if negharm then val = self.apply_negharm(val) end
+  val = negharm and self.apply_negharm(scale[ix]) or scale[ix]
+  
   note = val + transpose + (octave * 12)
   return on and synth(note, level)
 end
