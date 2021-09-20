@@ -12,7 +12,7 @@ mixolydian = {0,2,4,5,7,9,10} -- flat 7th
 aeolian = {0,2,3,5,7,8,10} -- flat 3rd, flat 6th, flat 7th
 locrian = {0,1,3,5,6,8,10} -- flat 2nd, flat 5th, flat 6th, flat 7th
 
--- other scales
+-- other
 chromatic = {0,1,2,3,4,5,6,7,8,9,10,11}
 harmoninc_min = {0,2,3,5,7,8,11} -- aeolian, sharp 7th
 diminished = {0,2,3,5,6,8,9,11}
@@ -34,6 +34,17 @@ blues_min = mask(phrygian, {1,3,4,6,7})
 blues_maj = mask(mixolydian, {1,2,4,5,6})
 penta_min = mask(aeolian, {1,3,4,5,7})
 japanese = mask(phrygian, {1,2,4,5,6})
+--
+
+
+-- chords
+I = {1,3,5}
+II = {2,4,6}
+III = {3,5,7}
+IV = {4,6,8}
+V = {5,7,9}
+VI = {6,8,10}
+VII = {7,9,11}
 --
 
 
@@ -100,17 +111,15 @@ function Vox.apply_mask(degree, scale, mask)
   local degree = closest_val - 1
   return degree
 end
---
-
 
 -- functions for mulitple Vox objects
-function _set(objects, property, val)
+function Vset(objects, property, val)
   for k, v in pairs(objects) do
     v[property] = val
   end
 end
 
-function _do(objects, method, args)
+function Vdo(objects, method, args)
   for k, v in pairs(objects) do
     v[method](v, args)
   end
