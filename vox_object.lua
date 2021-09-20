@@ -70,24 +70,6 @@ function Vox:new(args)
   return o
 end
 
-function Vox:set(args)
-  local args = args == nil and {} or args
-
-  self.on = args.on == nil and self.on or args.on
-  self.level = args.level == nil and self.level or args.level
-  self.scale = args.scale == nil and self.scale or args.scale
-  self.transpose = args.transpose == nil and self.transpose or args.transpose
-  self.degree = args.degree == nil and self.degree or args.degree
-  self.octave = args.octave == nil and self.octave or args.octave
-  self.synth = args.synth == nil and self.synth or args.synth
-
-  self.wrap = args.wrap == nil and self.wrap or args.wrap
-  self.mask = args.mask == nil and self.mask or args.mask -- this is wrong
-  self.negharm = args.negharm == nil and self.negharm or args.negharm
-
-  self.seq = args.seq == nil and {} or args.seq
-end
-
 function Vox:play(args)
   local args = args == nil and {} or args
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
