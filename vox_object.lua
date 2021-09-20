@@ -61,8 +61,9 @@ function Vox:new(args)
   o.octave = args.octave == nil and 0 or args.octave
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
 
-  o.mask = args.mask
+
   o.wrap = args.wrap ~= nil and args.wrap or false
+  o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
 
   o.seq = args.seq == nil and {} or args.seq
@@ -82,13 +83,13 @@ function Vox:play(args)
   octave = self.octave + (args.octave == nil and 0 or args.octave)
   synth = args.synth == nil and self.synth or args.synth
 
-  mask = args.mask == nil and self.mask or args.mask -- this is wrong
   wrap = args.wrap == nil and self.wrap or args.wrap
+  mask = args.mask == nil and self.mask or args.mask -- this is wrong
   negharm = args.negharm == nil and self.negharm or args.negharm
 
+  octave = not wrap and octave + smath.floor(degree / #scale) or octave
   ix = not mask and degree % #scale + 1 or self.apply_mask(degree % #scale + 1, scale, mask)
-  octave = not wrap and octave + self.apply_wrap(degree, scale) or octave
-  val = not negharm and scale[ix] or self.apply_negharm(scale[ix])
+  val = not negharm and scale[ix] or (7 - scale[ix]) % 12
   
   note = val + transpose + (octave * 12)
   return on and synth(note, level)
@@ -102,9 +103,6 @@ function Vox.apply_mask(ix, scale, mask)
   end
   return (closest_val - 1) % #scale + 1
 end
-
-function Vox.apply_wrap(degree, scale) return math.floor(degree / #scale) end
-function Vox.apply_negharm(val) return (7 - val) % 12 end
 --
 
 
