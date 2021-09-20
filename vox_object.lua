@@ -61,7 +61,6 @@ function Vox:new(args)
   o.octave = args.octave == nil and 0 or args.octave
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
 
-
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
@@ -87,7 +86,7 @@ function Vox:play(args)
   mask = args.mask == nil and self.mask or args.mask -- this is wrong
   negharm = args.negharm == nil and self.negharm or args.negharm
 
-  octave = not wrap and octave + smath.floor(degree / #scale) or octave
+  octave = not wrap and octave + math.floor(degree / #scale) or octave
   ix = not mask and degree % #scale + 1 or self.apply_mask(degree % #scale + 1, scale, mask)
   val = not negharm and scale[ix] or (7 - scale[ix]) % 12
   
