@@ -81,8 +81,8 @@ function Vox:set(args)
   self.octave = args.octave == nil and self.octave or args.octave
   self.synth = args.synth == nil and self.synth or args.synth
 
-  self.mask = args.mask == nil and self.mask or args.mask
   self.wrap = args.wrap == nil and self.wrap or args.wrap
+  self.mask = args.mask == nil and self.mask or args.mask -- this is wrong
   self.negharm = args.negharm == nil and self.negharm or args.negharm
 
   self.seq = args.seq == nil and {} or args.seq
@@ -101,7 +101,7 @@ function Vox:play(args)
   synth = args.synth == nil and self.synth or args.synth
 
   wrap = args.wrap == nil and self.wrap or args.wrap
-  mask = args.mask == nil and self.mask or args.mask
+  mask = args.mask == nil and self.mask or args.mask -- this is wrong
   negharm = args.negharm == nil and self.negharm or args.negharm
 
   ix = degree % #scale + 1
