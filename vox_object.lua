@@ -47,7 +47,7 @@ cv = {
 
 
 -- Vox object
--- DL, last modified 2021-09-19
+-- DL, last modified 2021-09-20
 Vox = {}
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
@@ -83,24 +83,29 @@ function Vox:play(args)
   synth = args.synth == nil and self.synth or args.synth
 
   wrap = args.wrap == nil and self.wrap or args.wrap
-  mask = args.mask == nil and self.mask or args.mask -- this is wrong
+  mask = args.mask == nil and self.mask or args.mask
   negharm = args.negharm == nil and self.negharm or args.negharm
 
   octave = not wrap and octave + math.floor(degree / #scale) or octave
-  ix = not mask and degree % #scale + 1 or self.apply_mask(degree % #scale + 1, scale, mask)
+  ix = not mask and degree % #scale + 1 or self.apply_mask(degree, scale, mask)
   val = not negharm and scale[ix] or (7 - scale[ix]) % 12
-  
+
   note = val + transpose + (octave * 12)
+
   return on and synth(note, level)
 end
 
-function Vox.apply_mask(ix, scale, mask)
-  local closest_val = mask[1]
+function Vox.apply_mask(degree, scale, mask)
+  local ix, closest_val = degree % #scale + 1, mask[1]
+
   for _, val in ipairs(mask) do
     val = (val - 1) % #scale + 1
     closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
   end
-  return (closest_val - 1) % #scale + 1
+
+  local ix = (closest_val - 1) % #scale + 1
+
+  return ix
 end
 --
 
