@@ -60,11 +60,9 @@ function Vox:new(args)
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 0 or args.octave
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
-
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
-
   o.seq = args.seq == nil and {} or args.seq
 
   return o
@@ -81,15 +79,13 @@ function Vox:play(args)
   degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
   octave = self.octave + (args.octave == nil and 0 or args.octave)
   synth = args.synth == nil and self.synth or args.synth
-
   wrap = args.wrap == nil and self.wrap or args.wrap
   mask = args.mask == nil and self.mask or args.mask
   negharm = args.negharm == nil and self.negharm or args.negharm
 
   octave = not wrap and octave + math.floor(degree / #scale) or octave
-  ix = not mask and degree % #scale + 1 or self.apply_mask(degree, scale, mask)
+  ix = not mask and degree % #scale + 1 or self.apply_mask(degree, scale, mask) % #scale + 1
   val = not negharm and scale[ix] or (7 - scale[ix]) % 12
-
   note = val + transpose + (octave * 12)
 
   return on and synth(note, level)
@@ -97,15 +93,12 @@ end
 
 function Vox.apply_mask(degree, scale, mask)
   local ix, closest_val = degree % #scale + 1, mask[1]
-
   for _, val in ipairs(mask) do
     val = (val - 1) % #scale + 1
     closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
   end
-
-  local ix = (closest_val - 1) % #scale + 1
-
-  return ix
+  local degree = closest_val - 1
+  return degree
 end
 --
 
