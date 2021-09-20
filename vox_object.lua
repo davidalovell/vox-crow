@@ -1,18 +1,21 @@
 --- Vox
 
+
 -- scales
--- DL, last modified 2021-09-12
 
 -- modes
 ionian = {0,2,4,5,7,9,11}
-dorian = {0,2,3,5,7,9,10}
-phrygian = {0,1,3,5,7,8,10}
-lydian = {0,2,4,6,7,9,11}
-mixolydian = {0,2,4,5,7,9,10}
-aeolian = {0,2,3,5,7,8,10}
-locrian = {0,1,3,5,6,8,10}
+dorian = {0,2,3,5,7,9,10} -- flat 3rd, flat 7th
+phrygian = {0,1,3,5,7,8,10} -- flat 2nd, flat 6th
+lydian = {0,2,4,6,7,9,11} -- sharp 4th
+mixolydian = {0,2,4,5,7,9,10} -- flat 7th
+aeolian = {0,2,3,5,7,8,10} -- flat 3rd, flat 6th, flat 7th
+locrian = {0,1,3,5,6,8,10} -- flat 2nd, flat 5th, flat 6th, flat 7th
 
--- other scales
+-- other
+chromatic = {0,1,2,3,4,5,6,7,8,9,10,11}
+harmoninc_min = {0,2,3,5,7,8,11} -- aeolian, sharp 7th
+diminished = {0,2,3,5,6,8,9,11}
 whole = {0,2,4,6,8,10}
 
 -- scale mask function
@@ -34,14 +37,15 @@ japanese = mask(phrygian, {1,2,4,5,6})
 --
 
 
-
-
--- divisions
-divs = {1/32, 1/16, 1/8, 1/4, 1/2, 1, 2, 4, 8, 16, 32}
+-- chords
+I = {1,3,5}
+II = {2,4,6}
+III = {3,5,7}
+IV = {4,6,8}
+V = {5,7,9}
+VI = {6,8,10}
+VII = {7,9,11}
 --
-
-
-
 
 
 -- initial values
@@ -53,99 +57,71 @@ cv = {
 --
 
 
-
-
 -- Vox object
--- DL, last modified 2021-09-13
-
+-- DL, last modified 2021-09-20
 Vox = {}
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
   local args = args == nil and {} or args
 
-  o.on, o._on = args.on == nil and true or args.on, true
-  o.level, o._level = args.level == nil and 1 or args.level, 1
-  o.octave, o._octave = args.octave == nil and 0 or args.octave, 0
-  o.degree, o._degree = args.degree == nil and 1 or args.degree, 1
-  o.transpose, o._transpose = args.transpose == nil and 0 or args.transpose, 0
-
+  o.on = args.on == nil and true or args.on
+  o.level = args.level == nil and 1 or args.level
   o.scale = args.scale == nil and cv.scale or args.scale
-  o.wrap = args.wrap == nil and false or args.wrap
-  o.negharm = args.negharm == nil and false or args.negharm
-
+  o.transpose = args.transpose == nil and 0 or args.transpose
+  o.degree = args.degree == nil and 1 or args.degree
+  o.octave = args.octave == nil and 0 or args.octave
   o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
-
+  o.wrap = args.wrap ~= nil and args.wrap or false
+  o.mask = args.mask
+  o.negharm = args.negharm ~= nil and args.negharm or false
   o.seq = args.seq == nil and {} or args.seq
-  o.preset = args.preset == nil and {} or args.preset
 
   return o
 end
 
 function Vox:play(args)
   local args = args == nil and {} or args
+  local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
 
-  self._on = args.on == nil and self._on or args.on
-  self._level = args.level == nil and self._level or args.level
-  self._octave = args.octave == nil and self._octave or args.octave
-  self._degree = args.degree == nil and self._degree or args.degree
-  self._transpose = args.transpose == nil and self._transpose or args.transpose
+  on = self.on and (args.on == nil and true or args.on)
+  level = self.level * (args.level == nil and 1 or args.level)
+  scale = args.scale == nil and self.scale or args.scale
+  transpose = self.transpose + (args.transpose == nil and 0 or args.transpose)
+  degree = (self.degree - 1) + ((args.degree == nil and 1 or args.degree) - 1)
+  octave = self.octave + (args.octave == nil and 0 or args.octave)
+  synth = args.synth == nil and self.synth or args.synth
+  wrap = args.wrap == nil and self.wrap or args.wrap
+  mask = args.mask == nil and self.mask or args.mask
+  negharm = args.negharm == nil and self.negharm or args.negharm
 
-  self.scale = args.scale == nil and self.scale or args.scale
-  self.wrap = args.wrap == nil and self.wrap or args.wrap
-  self.negharm = args.negharm == nil and self.negharm or args.negharm
+  octave = not wrap and octave + math.floor(degree / #scale) or octave
+  ix = not mask and degree % #scale + 1 or self.apply_mask(degree, scale, mask) % #scale + 1
+  val = not negharm and scale[ix] or (7 - scale[ix]) % 12
+  note = val + transpose + (octave * 12)
 
-  self.synth = args.synth == nil and self.synth or args.synth
-
-  return self:__on() and self.synth(self:__note(), self:__level())
+  return on and synth(note, level)
 end
 
-function Vox:__on() return self.on and self._on end
-function Vox:__level() return self.level * self._level end
-function Vox:__octave() return self.octave + self._octave + self:__wrap() end
-function Vox:__degree() return (self.degree - 1) + (self._degree - 1) end
-function Vox:__transpose() return self.transpose + self._transpose end
-
-function Vox:__wrap() return self.wrap and 0 or math.floor(self:__degree() / #self.scale) end
-
-function Vox:__val() return self.scale[self:__degree() % #self.scale + 1] end
-
-function Vox:__pos() return self:__val() + self:__transpose() end
-function Vox:__neg() return (7 - self:__pos()) % 12 end
-
-function Vox:__note() return (self.negharm and self:__neg() or self:__pos()) + self:__octave() * 12 end
+function Vox.apply_mask(degree, scale, mask)
+  local ix, closest_val = degree % #scale + 1, mask[1]
+  for _, val in ipairs(mask) do
+    val = (val - 1) % #scale + 1
+    closest_val = math.abs(val - ix) < math.abs(closest_val - ix) and val or closest_val
+  end
+  local degree = closest_val - 1
+  return degree
+end
 
 -- functions for mulitple Vox objects
-function _set(objects, property, val)
+function Vset(objects, property, val)
   for k, v in pairs(objects) do
     v[property] = val
   end
 end
 
-function _do(objects, method, args)
+function Vdo(objects, method, args)
   for k, v in pairs(objects) do
     v[method](v, args)
   end
 end
 --
-
-
-
-
-
-function clamp(x, min, max)
-  return math.min( math.max( min, x ), max )
-end
-
-function round(x)
-  return x % 1 >= 0.5 and math.ceil(x) or math.floor(x)
-end
-
-function linlin(x, in_min, in_max, out_min, out_max)
-  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-end
-
-function selector(x, data, in_min, in_max, out_min, out_max)
-  out_min = out_min or 1
-  out_max = out_max or #data
-  return data[ clamp( round( linlin( x, in_min, in_max, out_min, out_max ) ), out_min, out_max ) ]
-end
