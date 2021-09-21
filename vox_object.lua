@@ -58,7 +58,7 @@ cv = {
 
 
 -- Vox object
--- DL, last modified 2021-09-20
+-- DL, last modified 2021-09-21
 Vox = {}
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
@@ -75,6 +75,7 @@ function Vox:new(args)
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
   o.seq = args.seq == nil and {} or args.seq
+  o.preset = args.preset == nil and {} or args.preset
 
   return o
 end
@@ -112,7 +113,7 @@ function Vox.apply_mask(degree, scale, mask)
   return degree
 end
 
--- functions for mulitple Vox objects
+-- helper functions
 function Vset(objects, property, val)
   for k, v in pairs(objects) do
     v[property] = val
@@ -124,4 +125,11 @@ function Vdo(objects, method, args)
     v[method](v, args)
   end
 end
---
+
+function Vdyn(data)
+  local updated_data = {}
+  for k,v in pairs(data) do
+    updated_data[k] = data[k]()
+  end
+  return updated_data
+end
