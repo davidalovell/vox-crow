@@ -94,9 +94,9 @@ function Vox:play(args)
   mask = args.mask == nil and self.mask or args.mask
   negharm = args.negharm == nil and self.negharm or args.negharm
 
-  octave = not wrap and octave + math.floor(degree / #scale) or octave
-  ix = not mask and degree % #scale + 1 or self.apply_mask(degree, scale, mask) % #scale + 1
-  val = not negharm and scale[ix] or (7 - scale[ix]) % 12
+  octave = wrap and octave or octave + math.floor(degree / #scale)
+  ix = mask and self.apply_mask(degree, scale, mask) % #scale + 1 or degree % #scale + 1
+  val = negharm and (7 - scale[ix]) % 12 or scale[ix]
   note = val + transpose + (octave * 12)
 
   return on and synth(note, level)
