@@ -128,8 +128,9 @@ end
 
 function Vdyn(data)
   local updated_data = {}
-  for k,v in pairs(data) do
+  for k, v in pairs(data) do
     updated_data[k] = data[k]()
+    -- updated[k] = type(v) == 'function' and data[k]() or data[k]
   end
   return updated_data
 end
