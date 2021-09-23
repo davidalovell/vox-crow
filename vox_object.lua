@@ -66,11 +66,11 @@ function Vox:new(args)
 
   o.on = args.on == nil and true or args.on
   o.level = args.level == nil and 1 or args.level
-  o.scale = args.scale == nil and cv.scale or args.scale
+  o.scale = args.scale == nil and --[[ {0,2,4,6,7,9,11} ]] cv.scale or args.scale
   o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 0 or args.octave
-  o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
+  o.synth = args.synth == nil and function(note, level) --[[ ii.jf.play_note(note / 12, level) ]] return note, level end or args.synth
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
