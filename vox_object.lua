@@ -75,7 +75,6 @@ function Vox:new(args)
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
   o.seq = args.seq == nil and {} or args.seq
-  o.preset = args.preset == nil and {} or args.preset
 
   return o
 end
