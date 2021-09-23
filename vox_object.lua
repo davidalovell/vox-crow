@@ -81,7 +81,7 @@ function Vox:new(args)
 end
 
 function Vox:play(args)
-  local args = args == nil and {} or args
+  local args = args == nil and {} or self.dyn(args)
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
 
   on = self.on and (args.on == nil and true or args.on)
@@ -101,6 +101,14 @@ function Vox:play(args)
   note = val + transpose + (octave * 12)
 
   return on and synth(note, level)
+end
+
+function Vox.dyn(data)
+  local updated = {}
+  for k, v in pairs(data) do
+    updated[k] = type(v) == 'function' and data[k]() or data[k]
+  end
+  return updated
 end
 
 function Vox.apply_mask(degree, scale, mask)
@@ -124,12 +132,4 @@ function Vdo(objects, method, args)
   for k, v in pairs(objects) do
     v[method](v, args)
   end
-end
-
-function Vdyn(data)
-  local updated = {}
-  for k, v in pairs(data) do
-    updated[k] = type(v) == 'function' and data[k]() or data[k]
-  end
-  return updated
 end
