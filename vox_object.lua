@@ -66,11 +66,11 @@ function Vox:new(args)
 
   o.on = args.on == nil and true or args.on
   o.level = args.level == nil and 1 or args.level
-  o.scale = args.scale == nil and cv.scale or args.scale
+  o.scale = args.scale == nil and --[[ {0,2,4,6,7,9,11} ]] cv.scale or args.scale
   o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 0 or args.octave
-  o.synth = args.synth == nil and function(note, level) --[[ii.jf.play_note(note / 12, level)]] return note, level end or args.synth
+  o.synth = args.synth == nil and function(note, level) --[[ ii.jf.play_note(note / 12, level) ]] return note, level end or args.synth
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
@@ -80,7 +80,7 @@ function Vox:new(args)
 end
 
 function Vox:play(args)
-  local args = args == nil and {} or args
+  local args = args == nil and {} or self.update(args)
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
 
   on = self.on and (args.on == nil and true or args.on)
@@ -100,6 +100,14 @@ function Vox:play(args)
   note = val + transpose + (octave * 12)
 
   return on and synth(note, level)
+end
+
+function Vox.update(data)
+  local updated = {}
+  for k, v in pairs(data) do
+    updated[k] = type(v) == 'function' and data[k]() or data[k]
+  end
+  return updated
 end
 
 function Vox.apply_mask(degree, scale, mask)
@@ -123,12 +131,4 @@ function Vdo(objects, method, args)
   for k, v in pairs(objects) do
     v[method](v, args)
   end
-end
-
-function Vdyn(data)
-  local updated = {}
-  for k, v in pairs(data) do
-    updated[k] = type(v) == 'function' and data[k]() or data[k]
-  end
-  return updated
 end
