@@ -81,7 +81,7 @@ function Vox:new(args)
 end
 
 function Vox:play(args)
-  local args = args == nil and {} or self.dyn(args)
+  local args = args == nil and {} or self.update(args)
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
 
   on = self.on and (args.on == nil and true or args.on)
@@ -103,7 +103,7 @@ function Vox:play(args)
   return on and synth(note, level)
 end
 
-function Vox.dyn(data)
+function Vox.update(data)
   local updated = {}
   for k, v in pairs(data) do
     updated[k] = type(v) == 'function' and data[k]() or data[k]
