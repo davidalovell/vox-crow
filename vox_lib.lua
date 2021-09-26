@@ -1,5 +1,4 @@
--- Vox object
--- DL, last modified 2021-09-21
+-- Vox lib
 local Vox = {}
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
