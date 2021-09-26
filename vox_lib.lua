@@ -82,6 +82,7 @@ function Vox:newseq(args)
 end
 
 function Vox:addseq(args)
+  -- update this so it returns a table instead and can be used many times
   self.seq.vox_pset = self.seq.vox_pset == nil and {} or self.seq.vox_pset
   for k, v in pairs(args) do
     self['seq'][k] = v
