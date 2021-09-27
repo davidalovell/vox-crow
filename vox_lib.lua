@@ -62,32 +62,27 @@ end
 
 function Vox:newseq(args)
   local args = args == nil and {} or args
-  self:addseq(args)
 
-  self.seq.sync_pset = function()
-    return
-      all.division == nil and 1 or all.division
-      * self.seq.division == nil and 1 or self.seq.division
-      * self.seq.sync() == nil and 1 or self.seq.sync()
-  end
-
-  self.playseq = function(self)
-    while true do
-      self:play(self.seq.vox_pset)
-      clock.sync(self.seq.sync_pset())
+  self.addseq = function(self, args)
+    -- self.seq.dyn = self.seq.dyn == nil and {} or self.seq.dyn
+    for k, v in pairs(args) do
+      -- self['seq'][k] = v
+      -- self['seq']['dyn'][k] = (type(v) == 'function' or type(v) == 'table') and function() return v() end or v
+      self['seq'][k] = (type(v) == 'function' or type(v) == 'table') and function() return v() end or v
     end
   end
 
-  self.seq.clock = clock.run(self.seq.playseq)
-end
-
-function Vox:addseq(args)
-  -- update this so it returns a table instead and can be used many times
-  self.seq.vox_pset = self.seq.vox_pset == nil and {} or self.seq.vox_pset
-  for k, v in pairs(args) do
-    self['seq'][k] = v
-    self['seq']['vox_pset'][k] = type(self['seq'][k]) == 'table' and function() return self['seq'][k]() end or v
+  self.playseq = function(self)
+    -- while true do
+      return self:play(self.seq)
+      -- self:play(self.seq)
+      -- clock.sync(self.seq.sync() == nil and 1 or self.seq.sync())
+    -- end
   end
+
+  self:addseq(args)
+  -- self.clock = clock.run(self.playseq)
+
 end
 
 -- helper functions
