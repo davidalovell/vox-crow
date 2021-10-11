@@ -1,7 +1,8 @@
---- Vox for crow/JF
+--- Vox Object for Crow/JF
+-- @davidlovell
 
 
--- scales
+-- SCALES, useful with Vox object, but not required
 -- modes
 ionian = {0,2,4,5,7,9,11}
 dorian = {0,2,3,5,7,9,10} -- flat 3rd, flat 7th
@@ -42,16 +43,13 @@ IV = {4,6,8}
 V = {5,7,9}
 VI = {6,8,10}
 VII = {7,9,11}
---
 
 
--- Vox object
+-- VOX OBJECT
 ii.jf.mode(1) -- prerequisite for Vox object when used with JF
 
 Vox = {}
-
--- constructor, table as args
-function Vox:new(args)
+function Vox:new(args) -- constructor, table as args
   local o = setmetatable( {}, {__index = Vox} )
   local args = args == nil and {} or args
 
@@ -61,7 +59,7 @@ function Vox:new(args)
   o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 0 or args.octave
-  o.synth = args.synth == nil and function(note, level) ii.jf.play_note(note / 12, level) end or args.synth -- sends notes to JF by default
+  o.synth = args.synth == nil and function(note, level) ii.jf.play_note(note / 12, level) end or args.synth -- sends notes to JF by default, note / 12 = volts
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
@@ -73,8 +71,7 @@ function Vox:new(args)
   return o
 end
 
--- play method, table as args (or pass a table of functions so table values are updated dynamically)
-function Vox:play(args)
+function Vox:play(args) -- play method, table as args (or pass a table of functions, see Vox.update)
   local args = args == nil and {} or self.update(args)
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
 
@@ -97,7 +94,7 @@ function Vox:play(args)
   return on and synth(note, level)
 end
 
-function Vox.update(data)
+function Vox.update(data) -- takes a table of functions and returns updated results
   local updated = {}
   for k, v in pairs(data) do
     updated[k] = type(v) == 'function' and data[k]() or data[k]
@@ -105,7 +102,7 @@ function Vox.update(data)
   return updated
 end
 
-function Vox.apply_mask(degree, scale, mask)
+function Vox.apply_mask(degree, scale, mask) -- currently does not round up if nearest value is in the next octave, any ideas?
   local ix, closest_val = degree % #scale + 1, mask[1]
   for _, val in ipairs(mask) do
     val = (val - 1) % #scale + 1
@@ -115,15 +112,13 @@ function Vox.apply_mask(degree, scale, mask)
   return degree
 end
 
--- set properties of multiple Vox objects
-function Vox.set(objects, property, val)
+function Vox.set(objects, property, val) -- set properties of multiple Vox objects
   for k, v in pairs(objects) do
     v[property] = val
   end
 end
 
--- call methods of multiple Vox objects
-function Vox.call(objects, method, args)
+function Vox.call(objects, method, args) -- call methods of multiple Vox objects
   for k, v in pairs(objects) do
     v[method](v, args)
   end
