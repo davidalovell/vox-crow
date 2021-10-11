@@ -1,8 +1,7 @@
---- Vox
+--- Vox for crow/JF
 
 
 -- scales
-
 -- modes
 ionian = {0,2,4,5,7,9,11}
 dorian = {0,2,3,5,7,9,10} -- flat 3rd, flat 7th
@@ -27,17 +26,15 @@ function mask(scale, degrees)
   return m
 end
 
--- pentatonic scales
+-- derived pentatonic scales (using mask function)
 penta_maj = mask(ionian, {1,2,3,5,6})
 penta_sus = mask(dorian, {1,2,4,5,7})
 blues_min = mask(phrygian, {1,3,4,6,7})
 blues_maj = mask(mixolydian, {1,2,4,5,6})
 penta_min = mask(aeolian, {1,3,4,5,7})
 japanese = mask(phrygian, {1,2,4,5,6})
---
 
-
--- chords
+-- diatonic triads
 I = {1,3,5}
 II = {2,4,6}
 III = {3,5,7}
@@ -48,37 +45,35 @@ VII = {7,9,11}
 --
 
 
--- initial values
-cv = {
-  scale = mixolydian,
-  octave = 0,
-  degree = 1
-}
---
-
-
 -- Vox object
--- DL, last modified 2021-09-21
+ii.jf.mode(1) -- prerequisite for Vox object when used with JF
+
 Vox = {}
+
+-- constructor, table as args
 function Vox:new(args)
   local o = setmetatable( {}, {__index = Vox} )
   local args = args == nil and {} or args
 
   o.on = args.on == nil and true or args.on
   o.level = args.level == nil and 1 or args.level
-  o.scale = args.scale == nil and --[[ {0,2,4,6,7,9,11} ]] cv.scale or args.scale
+  o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale -- lydian by default
   o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 0 or args.octave
-  o.synth = args.synth == nil and function(note, level) --[[ ii.jf.play_note(note / 12, level) ]] return note, level end or args.synth
+  o.synth = args.synth == nil and function(note, level) ii.jf.play_note(note / 12, level) end or args.synth -- sends notes to JF by default
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
+  
+  -- empty tables for use with sequins
   o.seq = args.seq == nil and {} or args.seq
+  o.clk = args.clk == nil and {} or args.clk
 
   return o
 end
 
+-- play method, table as args (or pass a table of functions so table values are updated dynamically)
 function Vox:play(args)
   local args = args == nil and {} or self.update(args)
   local on, level, scale, transpose, degree, octave, synth, mask, wrap, negharm, ix, val, note
@@ -120,14 +115,15 @@ function Vox.apply_mask(degree, scale, mask)
   return degree
 end
 
--- helper functions
-function Vset(objects, property, val)
+-- set properties of multiple Vox objects
+function Vox.set(objects, property, val)
   for k, v in pairs(objects) do
     v[property] = val
   end
 end
 
-function Vdo(objects, method, args)
+-- call methods of multiple Vox objects
+function Vox.call(objects, method, args)
   for k, v in pairs(objects) do
     v[method](v, args)
   end
