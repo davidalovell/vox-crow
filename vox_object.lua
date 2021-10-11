@@ -59,7 +59,7 @@ function Vox:new(args) -- constructor, table as args
   o.level = args.level == nil and 1 or args.level
   o.scale = args.scale == nil and {0,2,4,6,7,9,11} or args.scale -- lydian by default
   o.transpose = args.transpose == nil and 0 or args.transpose
-  o.degree = args.degree == nil and 1 or args.degree
+  o.degree = args.degree == nil and 1 or args.degree -- 1 based
   o.octave = args.octave == nil and 0 or args.octave
   o.synth = args.synth == nil and function(note, level) ii.jf.play_note(note / 12, level) end or args.synth -- sends notes to JF by default, volts = note / 12
   o.wrap = args.wrap ~= nil and args.wrap or false
