@@ -36,7 +36,7 @@ blues_maj = mask(mixolydian, {1,2,4,5,6})
 penta_min = mask(aeolian, {1,3,4,5,7})
 japanese = mask(phrygian, {1,2,4,5,6})
 
--- diatonic triads
+-- diatonic triads (for use with Vox.mask property)
 I = {1,3,5}
 II = {2,4,6}
 III = {3,5,7}
