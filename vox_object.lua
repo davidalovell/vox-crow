@@ -59,7 +59,7 @@ function Vox:new(args) -- constructor, table as args
   o.transpose = args.transpose == nil and 0 or args.transpose
   o.degree = args.degree == nil and 1 or args.degree
   o.octave = args.octave == nil and 0 or args.octave
-  o.synth = args.synth == nil and function(note, level) ii.jf.play_note(note / 12, level) end or args.synth -- sends notes to JF by default, note / 12 = volts
+  o.synth = args.synth == nil and function(note, level) ii.jf.play_note(note / 12, level) end or args.synth -- sends notes to JF by default, volts = note / 12
   o.wrap = args.wrap ~= nil and args.wrap or false
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
