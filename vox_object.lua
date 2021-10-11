@@ -66,7 +66,7 @@ function Vox:new(args) -- constructor, table as args
   o.mask = args.mask
   o.negharm = args.negharm ~= nil and args.negharm or false
   
-  -- empty tables for use with sequins
+  -- empty tables for use with sequins (see examples)
   o.seq = args.seq == nil and {} or args.seq
   o.clk = args.clk == nil and {} or args.clk
 
