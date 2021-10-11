@@ -1,20 +1,19 @@
 --- Vox Object for Crow/JF
 -- @davidlovell
 
-
 -- SCALES, useful with Vox object but not required
 -- modes
 ionian = {0,2,4,5,7,9,11}
-dorian = {0,2,3,5,7,9,10} -- flat 3rd, flat 7th
-phrygian = {0,1,3,5,7,8,10} -- flat 2nd, flat 6th
-lydian = {0,2,4,6,7,9,11} -- sharp 4th
-mixolydian = {0,2,4,5,7,9,10} -- flat 7th
-aeolian = {0,2,3,5,7,8,10} -- flat 3rd, flat 6th, flat 7th
-locrian = {0,1,3,5,6,8,10} -- flat 2nd, flat 5th, flat 6th, flat 7th
+dorian = {0,2,3,5,7,9,10} -- 1, 2, b3, 4, 5, 6, b7
+phrygian = {0,1,3,5,7,8,10} -- 1, b2, 3, 4, 5, b6, 7
+lydian = {0,2,4,6,7,9,11} -- 1, 2, 3, #4, 5, 6, 7
+mixolydian = {0,2,4,5,7,9,10} -- 1, 2, 3, 4, 5, 6, b7
+aeolian = {0,2,3,5,7,8,10} -- 1, 2, b3, 4, 5, b6, b7
+locrian = {0,1,3,5,6,8,10} -- 1, b2, b3, 4, b5, b6, b7
 
 -- other
 chromatic = {0,1,2,3,4,5,6,7,8,9,10,11}
-harmoninc_min = {0,2,3,5,7,8,11} -- aeolian, sharp 7th
+harmoninc_min = {0,2,3,5,7,8,11} -- 1, 2, b3, 4, 5, b6, 7
 diminished = {0,2,3,5,6,8,9,11}
 whole = {0,2,4,6,8,10}
 
@@ -46,7 +45,7 @@ VII = {7,9,11}
 
 
 -- VOX OBJECT
-ii.jf.mode(1) -- prerequisite for Vox object when used with JF
+ii.jf.mode(1) -- prerequisite for Vox object when used with JF (its current form)
 
 Vox = {}
 function Vox:new(args) -- constructor, table as args
