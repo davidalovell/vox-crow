@@ -2,7 +2,7 @@
 -- @davidlovell
 
 
--- SCALES, useful with Vox object, but not required
+-- SCALES, useful with Vox object but not required
 -- modes
 ionian = {0,2,4,5,7,9,11}
 dorian = {0,2,3,5,7,9,10} -- flat 3rd, flat 7th
