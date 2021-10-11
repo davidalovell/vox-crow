@@ -94,7 +94,7 @@ function Vox:play(args) -- play method, table as args (or pass a table of functi
   return on and synth(note, level)
 end
 
-function Vox.update(data) -- takes a table of functions and returns updated results
+function Vox.update(data) -- takes a table of functions and returns a table with the results of these functions as static values
   local updated = {}
   for k, v in pairs(data) do
     updated[k] = type(v) == 'function' and data[k]() or data[k]
