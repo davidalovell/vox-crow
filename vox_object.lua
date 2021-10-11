@@ -1,6 +1,8 @@
 --- Vox Object for Crow/JF
 -- @davidlovell
 
+
+
 -- SCALES, useful with Vox object but not required
 -- modes
 ionian = {0,2,4,5,7,9,11}
@@ -42,6 +44,7 @@ IV = {4,6,8}
 V = {5,7,9}
 VI = {6,8,10}
 VII = {7,9,11}
+
 
 
 -- VOX OBJECT
